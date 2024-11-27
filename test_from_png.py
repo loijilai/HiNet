@@ -62,52 +62,50 @@ net.eval()
 dwt = common.DWT()
 iwt = common.IWT()
 
-images = sorted(os.listdir(c.VAL_PATH))
+dir = "/home/lai/Research/Graduate/HiNet/image/steg/"
+images = sorted(os.listdir(dir))
 print(images)
 
 with torch.no_grad():
-    for i in range(5):
-        print(images[i], images[i+1])
-        secret_image = Image.open(c.VAL_PATH + images[2*i])
-        cover_image = Image.open(c.VAL_PATH + images[2*i+1])
-        secret_image = to_rgb(secret_image)
-        cover_image = to_rgb(cover_image)
-        secret_data = transform_val(secret_image).unsqueeze(0)
-        cover_data = transform_val(cover_image).unsqueeze(0)
-        data = torch.cat((secret_data, cover_data), 0)
-        print(data.shape)
+    for i, img_name in enumerate(images):
+        steg_image = Image.open(dir + img_name)
+        steg_image = to_rgb(steg_image)
+        steg_data = transform_val(steg_image).unsqueeze(0)
+        steg_data = steg_data.to(device)
+        output_steg = dwt(steg_data)
+        backward_z = gauss_noise(output_steg.shape)
 
-        data = data.to(device)
-        cover = data[data.shape[0] // 2:, :, :, :]
-        secret = data[:data.shape[0] // 2, :, :, :]
-        cover_input = dwt(cover)
-        secret_input = dwt(secret)
-        input_img = torch.cat((cover_input, secret_input), 1)
+        # data = data.to(device)
+        # cover = data[data.shape[0] // 2:, :, :, :]
+        # secret = data[:data.shape[0] // 2, :, :, :]
+        # cover_input = dwt(cover)
+        # secret_input = dwt(secret)
+        # input_img = torch.cat((cover_input, secret_input), 1)
 
         #################
         #    forward:   #
         #################
-        output = net(input_img)
-        output_steg = output.narrow(1, 0, 4 * c.channels_in)
-        output_z = output.narrow(1, 4 * c.channels_in, output.shape[1] - 4 * c.channels_in)
-        steg_img = iwt(output_steg)
-        backward_z = gauss_noise(output_z.shape)
+        # output = net(input_img)
+        # output_steg = output.narrow(1, 0, 4 * c.channels_in)
+        # output_z = output.narrow(1, 4 * c.channels_in, output.shape[1] - 4 * c.channels_in)
+        # steg_img = iwt(output_steg)
 
         #################
         #   backward:   #
         #################
         output_rev = torch.cat((output_steg, backward_z), 1)
+        print(output_rev.shape)
         bacward_img = net(output_rev, rev=True)
         secret_rev = bacward_img.narrow(1, 4 * c.channels_in, bacward_img.shape[1] - 4 * c.channels_in)
         secret_rev = iwt(secret_rev)
         cover_rev = bacward_img.narrow(1, 0, 4 * c.channels_in)
         cover_rev = iwt(cover_rev)
-        resi_cover = (steg_img - cover) * 20
-        resi_secret = (secret_rev - secret) * 20
+        # resi_cover = (steg_img - cover) * 20
+        # resi_secret = (secret_rev - secret) * 20
 
-        torchvision.utils.save_image(cover, c.IMAGE_PATH_cover + '%.5d.png' % i)
-        torchvision.utils.save_image(secret, c.IMAGE_PATH_secret + '%.5d.png' % i)
-        torchvision.utils.save_image(steg_img, c.IMAGE_PATH_steg + '%.5d.png' % i)
+        # torchvision.utils.save_image(cover, c.IMAGE_PATH_cover + '%.5d.png' % i)
+        # torchvision.utils.save_image(secret, c.IMAGE_PATH_secret + '%.5d.png' % i)
+        # torchvision.utils.save_image(steg_img, c.IMAGE_PATH_steg + '%.5d.png' % i)
         torchvision.utils.save_image(secret_rev, c.IMAGE_PATH_secret_rev + '%.5d.png' % i)
 
 
