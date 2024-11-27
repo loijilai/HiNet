@@ -20,15 +20,18 @@ weight_step = 1000
 gamma = 0.5
 
 # Val:
-cropsize_val = 1024
+# cropsize_val = 1024
+cropsize_val = 224
 batchsize_val = 2
 shuffle_val = False
 val_freq = 50
 
 
 # Dataset
-TRAIN_PATH = '/home/jjp/Dataset/DIV2K/DIV2K_train_HR/'
-VAL_PATH = '/home/jjp/Dataset/DIV2K/DIV2K_valid_HR/'
+# TRAIN_PATH = '/home/jjp/Dataset/DIV2K/DIV2K_train_HR/'
+# VAL_PATH = '/home/jjp/Dataset/DIV2K/DIV2K_valid_HR/'
+TRAIN_PATH = '/home/lai/Research/coco/small_images_png/pure/'
+VAL_PATH = '/home/lai/Research/coco/small_images_png/pure/'
 format_train = 'png'
 format_val = 'png'
 
@@ -42,11 +45,12 @@ progress_bar = False
 
 # Saving checkpoints:
 
-MODEL_PATH = '/home/jjp/Hinet/model/'
+# MODEL_PATH = '/home/jjp/Hinet/model/'
+MODEL_PATH = '/home/lai/Research/Graduate/HiNet/'
 checkpoint_on_error = True
 SAVE_freq = 50
 
-IMAGE_PATH = '/home/jjp/Hinet/image/'
+IMAGE_PATH = '/home/lai/Research/Graduate/HiNet/image/'
 IMAGE_PATH_cover = IMAGE_PATH + 'cover/'
 IMAGE_PATH_secret = IMAGE_PATH + 'secret/'
 IMAGE_PATH_steg = IMAGE_PATH + 'steg/'
